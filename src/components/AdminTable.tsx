@@ -144,7 +144,7 @@ export default function AdminTable({ adminKey }: { adminKey: string }) {
               <tr className="border-b border-white/5">
                 <th className="px-4 py-3 font-display text-mist-dim text-xs font-semibold uppercase tracking-wider">#</th>
                 <th className="px-4 py-3 font-display text-mist-dim text-xs font-semibold uppercase tracking-wider">Email</th>
-                <th className="px-4 py-3 font-display text-mist-dim text-xs font-semibold uppercase tracking-wider hidden sm:table-cell">WhatsApp</th>
+                <th className="px-4 py-3 font-display text-mist-dim text-xs font-semibold uppercase tracking-wider">WhatsApp</th>
                 <th className="px-4 py-3 font-display text-mist-dim text-xs font-semibold uppercase tracking-wider">Role</th>
                 <th className="px-4 py-3 font-display text-mist-dim text-xs font-semibold uppercase tracking-wider hidden md:table-cell">Interests</th>
                 <th className="px-4 py-3 font-display text-mist-dim text-xs font-semibold uppercase tracking-wider hidden lg:table-cell">Source</th>
@@ -166,7 +166,7 @@ export default function AdminTable({ adminKey }: { adminKey: string }) {
                 <tr key={s.id} className="border-b border-white/5 hover:bg-midnight/30 transition-colors">
                   <td className="px-4 py-3 font-body text-mist-dim text-sm">{(page - 1) * 20 + i + 1}</td>
                   <td className="px-4 py-3 font-body text-mist text-sm">{s.email}</td>
-                  <td className="px-4 py-3 font-body text-mist-dim text-sm hidden sm:table-cell">{s.whatsapp || '—'}</td>
+                  <td className="px-4 py-3 font-body text-mist-dim text-sm">{s.whatsapp || '—'}</td>
                   <td className="px-4 py-3 font-body text-sm">
                     {editingId === s.id ? (
                       <select
