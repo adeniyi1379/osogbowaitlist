@@ -3,6 +3,10 @@
     {
       "source": "/api/(.*)",
       "destination": "https://osogbowaitlistbackend.onrender.com/api/$1"
+    },
+    {
+      "source": "/((?!assets/).*)",
+      "destination": "/index.html"
     }
   ]
 }
