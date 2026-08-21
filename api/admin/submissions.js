@@ -1,4 +1,10 @@
-import { supabase, ADMIN_KEY } from "../../_lib.js";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
+const ADMIN_KEY = process.env.ADMIN_KEY || "osogbo-admin-2024";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -17,7 +23,9 @@ export default async function handler(req, res) {
   const offset = (page - 1) * perPage;
 
   try {
-    let countQuery = supabase.from("waitlist").select("id", { count: "exact", head: true });
+    let countQuery = supabase
+      .from("waitlist")
+      .select("id", { count: "exact", head: true });
 
     if (search) {
       countQuery = countQuery.ilike("email", `%${search}%`);
@@ -26,10 +34,7 @@ export default async function handler(req, res) {
       countQuery = countQuery.eq("role", role);
     }
 
-    const { count, error: countError } = await countQuery;
-    if (countError) {
-      console.error("Count error:", countError);
-    }
+    const { count } = await countQuery;
 
     let dataQuery = supabase
       .from("waitlist")
@@ -44,11 +49,10 @@ export default async function handler(req, res) {
       dataQuery = dataQuery.eq("role", role);
     }
 
-    const { data, error: dataError } = await dataQuery;
+    const { data, error } = await dataQuery;
 
-    if (dataError) {
-      console.error("Data error:", dataError);
-      return res.status(500).json({ detail: "Failed to fetch submissions.", error: dataError.message });
+    if (error) {
+      return res.status(500).json({ detail: "Failed to fetch.", error: error.message });
     }
 
     return res.status(200).json({
@@ -66,7 +70,6 @@ export default async function handler(req, res) {
       })),
     });
   } catch (err) {
-    console.error("Unexpected error:", err);
-    return res.status(500).json({ detail: "Server error.", error: err.message });
+    return res.status(500).json({ detail: "Server error." });
   }
 }

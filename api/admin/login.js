@@ -1,4 +1,4 @@
-import { ADMIN_KEY } from "../_lib.js";
+const ADMIN_KEY = process.env.ADMIN_KEY || "osogbo-admin-2024";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {

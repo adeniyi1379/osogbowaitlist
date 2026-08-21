@@ -1,4 +1,10 @@
-import { supabase, ADMIN_KEY } from "../../_lib.js";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
+const ADMIN_KEY = process.env.ADMIN_KEY || "osogbo-admin-2024";
 
 export default async function handler(req, res) {
   const key = req.query.key;
@@ -7,27 +13,21 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { count: total, error: e1 } = await supabase
+    const { count: total } = await supabase
       .from("waitlist")
       .select("id", { count: "exact", head: true });
-
-    if (e1) console.error("Stats total error:", e1);
 
     const todayStart = new Date();
     todayStart.setUTCHours(0, 0, 0, 0);
 
-    const { count: today, error: e2 } = await supabase
+    const { count: today } = await supabase
       .from("waitlist")
       .select("id", { count: "exact", head: true })
       .gte("created_at", todayStart.toISOString());
 
-    if (e2) console.error("Stats today error:", e2);
-
-    const { data: roles, error: e3 } = await supabase
+    const { data: roles } = await supabase
       .from("waitlist")
       .select("role");
-
-    if (e3) console.error("Stats roles error:", e3);
 
     const rolesBreakdown = {};
     (roles || []).forEach((r) => {
@@ -41,7 +41,6 @@ export default async function handler(req, res) {
       roles_breakdown: rolesBreakdown,
     });
   } catch (err) {
-    console.error("Stats unexpected error:", err);
     return res.status(200).json({
       total_signups: 0,
       today_signups: 0,
