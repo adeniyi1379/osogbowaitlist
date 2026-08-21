@@ -6,31 +6,46 @@ export default async function handler(req, res) {
     return res.status(403).json({ detail: "Invalid admin key." });
   }
 
-  const { count: total } = await supabase
-    .from("waitlist")
-    .select("id", { count: "exact", head: true });
+  try {
+    const { count: total, error: e1 } = await supabase
+      .from("waitlist")
+      .select("id", { count: "exact", head: true });
 
-  const todayStart = new Date();
-  todayStart.setUTCHours(0, 0, 0, 0);
+    if (e1) console.error("Stats total error:", e1);
 
-  const { count: today } = await supabase
-    .from("waitlist")
-    .select("id", { count: "exact", head: true })
-    .gte("created_at", todayStart.toISOString());
+    const todayStart = new Date();
+    todayStart.setUTCHours(0, 0, 0, 0);
 
-  const { data: roles } = await supabase
-    .from("waitlist")
-    .select("role");
+    const { count: today, error: e2 } = await supabase
+      .from("waitlist")
+      .select("id", { count: "exact", head: true })
+      .gte("created_at", todayStart.toISOString());
 
-  const rolesBreakdown = {};
-  (roles || []).forEach((r) => {
-    const key = r.role || "unset";
-    rolesBreakdown[key] = (rolesBreakdown[key] || 0) + 1;
-  });
+    if (e2) console.error("Stats today error:", e2);
 
-  return res.status(200).json({
-    total_signups: total || 0,
-    today_signups: today || 0,
-    roles_breakdown: rolesBreakdown,
-  });
+    const { data: roles, error: e3 } = await supabase
+      .from("waitlist")
+      .select("role");
+
+    if (e3) console.error("Stats roles error:", e3);
+
+    const rolesBreakdown = {};
+    (roles || []).forEach((r) => {
+      const k = r.role || "unset";
+      rolesBreakdown[k] = (rolesBreakdown[k] || 0) + 1;
+    });
+
+    return res.status(200).json({
+      total_signups: total || 0,
+      today_signups: today || 0,
+      roles_breakdown: rolesBreakdown,
+    });
+  } catch (err) {
+    console.error("Stats unexpected error:", err);
+    return res.status(200).json({
+      total_signups: 0,
+      today_signups: 0,
+      roles_breakdown: {},
+    });
+  }
 }
